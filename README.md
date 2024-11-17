@@ -1,0 +1,2 @@
+# mynewproj
+Crypto stat
