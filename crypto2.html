@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/mynewproj/img/usd.ico">
+    <link rel="stylesheet" href="styles.css">
+    <title>Курси криптовалют</title>
+</head>
+<body>
+    <header>
+        <h1>Курси криптовалют</h1>
+        <p id="update-time">Оновлюється...</p>
+    </header>
+
+    <div class="container">
+        <h2>Актуальні курси</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Назва</th>
+                    <th>Код</th>
+                    <th>Ціна (USD)</th>
+                    <th>Зміна (24 години)</th>
+                </tr>
+            </thead>
+            <tbody id="crypto-data">
+                <tr>
+                    <td colspan="4">Завантаження даних...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="map-container">
+        <h3>Популярні криптовалютні платформи:</h3>
+        <a href="https://www.tradingview.com/" target="_blank">TradingView</a>
+        <a href="https://www.bybit.com/" target="_blank">Bybit</a>
+        <a href="https://www.binance.com/" target="_blank">Binance</a>
+        <a href="https://www.kraken.com/" target="_blank">Kraken</a>
+        <a href="https://www.coinbase.com/" target="_blank">Coinbase</a>
+        <a href="https://www.okx.com/" target="_blank">OKX</a>
+    </div>
+
+    <footer>
+        <p>© 2024 Курси криптовалют. Усі права захищено.</p>
+    </footer>
+
+    <script>
+        async function fetchCryptoData() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=5&page=1&sparkline=false');
+                const data = await response.json();
+
+                const tableBody = document.getElementById('crypto-data');
+                tableBody.innerHTML = '';
+
+                data.forEach(coin => {
+                    const row = `
+                        <tr>
+                            <td>${coin.name}</td>
+                            <td>${coin.symbol.toUpperCase()}</td>
+                            <td>$${coin.current_price.toLocaleString()}</td>
+                            <td style="color: ${coin.price_change_percentage_24h >= 0 ? 'green' : 'red'};">
+                                ${coin.price_change_percentage_24h.toFixed(2)}%
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+
+                const updateTime = document.getElementById('update-time');
+                const now = new Date();
+                updateTime.textContent = `Останнє оновлення: ${now.toLocaleTimeString()}`;
+            } catch (error) {
+                console.error('Помилка при завантаженні даних:', error);
+                document.getElementById('crypto-data').innerHTML = '<tr><td colspan="4">Не вдалося завантажити дані.</td></tr>';
+            }
+        }
+
+        fetchCryptoData();
+        setInterval(fetchCryptoData, 300000);
+    </script>
+</body>
+</html>
